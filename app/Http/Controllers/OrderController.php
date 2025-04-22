@@ -88,11 +88,14 @@ public function show(Order $order)
 //edit
 public function edit(Order $order)
 {
-    $order->load(['customer', 'items.product']);
-    $products = \App\Models\Product::all();
+    $order->load('orderItems.product'); // preload product with image
 
-    return view('orders.edit', compact('order', 'products'));
+    $customers = Customer::all();
+    $products = Product::all();
+
+    return view('orders.edit', compact('order', 'customers', 'products'));
 }
+
 //update
 public function update(Request $request, Order $order)
 {

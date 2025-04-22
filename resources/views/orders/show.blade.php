@@ -123,6 +123,12 @@
                 text-align: left;
             }
         }
+        .product-img {
+            width: 50px;
+            height: 50px;
+            border-radius: 6px;
+            object-fit: cover;
+        }
     </style>
 </head>
 <body>
@@ -142,6 +148,7 @@
                 <th>Sl. No</th>
                 <th>Product</th>
                 <th>Qty</th>
+                <th>image</th>
                 <th>Price</th>
                 <th>Total</th>
             </tr>
@@ -152,6 +159,17 @@
                     <td data-label="Sl. No">{{ $index + 1 }}</td>
                     <td data-label="Product">{{ $item->product->name }}</td>
                     <td data-label="Qty">{{ $item->quantity }}</td>
+                    <td>
+                    @php
+                    $firstOrderItem = optional($order->orderItems)->first();
+                    $imagePath = optional($firstOrderItem?->product)->image;
+                    @endphp
+                    @if($imagePath)
+                        <img src="{{ asset('storage/' . $imagePath) }}" alt="Product Image" class="product-img">
+                    @else
+                        N/A
+                    @endif
+                </td>
                     <td data-label="Price">₹{{ number_format($item->price, 2) }}</td>
                     <td data-label="Total">₹{{ number_format($item->total, 2) }}</td>
                 </tr>

@@ -116,6 +116,14 @@
         button[type="submit"]:hover {
             background-color: #4263eb;
         }
+
+        .product-image {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
     </style>
 </head>
 <body>
@@ -144,33 +152,39 @@
     <h3 style="margin-top: 30px;">Products:</h3>
     <table>
         <thead>
-            <tr>
-                <th>SL No</th>
-                <th>Product</th>
-                <th>Qty</th>
-                <th>Price</th>
-                <th>Total</th>
-                <th>Action</th>
-            </tr>
+        <tr>
+            <th>SL No</th>
+            <th>Product</th>
+            <th>Image</th>
+            <th>Qty</th>
+            <th>Price</th>
+            <th>Total</th>
+            <th>Action</th>
+        </tr>
         </thead>
         <tbody id="product-rows">
-            <tr>
-                <td>1</td>
-                <td>
-                    <select name="products[0][product_id]" class="product-select" required>
-                        <option value="">-- Select --</option>
-                        @foreach ($products as $product)
-                            <option value="{{ $product->id }}" data-price="{{ $product->price }}">
-                                {{ $product->name }}
-                            </option>
-                        @endforeach
-                    </select>
-                </td>
-                <td><input type="number" name="products[0][quantity]" class="qty" value="1" min="1" required></td>
-                <td><input type="text" name="products[0][price]" class="price" readonly></td>
-                <td><input type="text" name="products[0][total]" class="total" readonly></td>
-                <td><button type="button" class="remove-row">🗑️</button></td>
-            </tr>
+        <tr>
+            <td>1</td>
+            <td>
+                <select name="products[0][product_id]" class="product-select" required>
+                    <option value="">-- Select --</option>
+                    @foreach ($products as $product)
+                        <option value="{{ $product->id }}"
+                                data-price="{{ $product->price }}"
+                                data-image="{{ asset('storage/' . $product->image) }}">
+                            {{ $product->name }}
+                        </option>
+                    @endforeach
+                </select>
+            </td>
+            <td>
+                <img src="" class="product-image">
+            </td>
+            <td><input type="number" name="products[0][quantity]" class="qty" value="1" min="1" required></td>
+            <td><input type="text" name="products[0][price]" class="price" readonly></td>
+            <td><input type="text" name="products[0][total]" class="total" readonly></td>
+            <td><button type="button" class="remove-row">🗑️</button></td>
+        </tr>
         </tbody>
     </table>
 
@@ -182,7 +196,6 @@
 </form>
 
 <script>
-    // customer autofill
     document.getElementById('customer_id').addEventListener('change', function () {
         const selected = this.options[this.selectedIndex];
         const address = selected.getAttribute('data-address');
@@ -190,7 +203,6 @@
     });
 
     let rowCount = 1;
-    const products = @json($products);
 
     function updateTotals() {
         let total = 0;
@@ -212,6 +224,7 @@
             if (el.tagName === 'INPUT') el.value = (el.classList.contains('qty')) ? 1 : '';
             if (el.classList.contains('total') || el.classList.contains('price')) el.value = '';
         });
+        newRow.querySelector('.product-image').src = '';
         newRow.querySelector('td:first-child').textContent = rowCount + 1;
         table.appendChild(newRow);
         rowCount++;
@@ -221,9 +234,12 @@
 
     document.addEventListener('change', function (e) {
         if (e.target.classList.contains('product-select')) {
-            const price = e.target.selectedOptions[0].dataset.price || 0;
+            const selected = e.target.selectedOptions[0];
+            const price = selected.dataset.price || 0;
+            const image = selected.dataset.image || '';
             const row = e.target.closest('tr');
             row.querySelector('.price').value = price;
+            row.querySelector('.product-image').src = image;
             updateTotals();
         }
         if (e.target.classList.contains('qty')) {
