@@ -1,3 +1,11 @@
+@extends('layouts.app')
+
+@section('content')
+
+@if(session('success'))
+    <div class="alert alert-success">{{ session('success') }}</div>
+@endif
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -113,50 +121,71 @@
             padding: 20px;
             color: #888;
         }
+
+        .product-img {
+            width: 50px;
+            height: 50px;
+            border-radius: 6px;
+            object-fit: cover;
+        }
     </style>
 </head>
 <body>
 
-    <h1>Orders</h1>
+<h1>Orders</h1>
 
-    <a href="{{ route('orders.create') }}" class="add-btn">➕ Add New Order</a>
+<a href="{{ route('orders.create') }}" class="add-btn">➕ Add New Order</a>
 
-    <table>
-        <thead>
+<table>
+    <thead>
+        <tr>
+            <th>Sl. No</th>
+            <th>Order No</th>
+            <th>Date</th>
+            <th>Customer</th>
+            <th>Total Price</th>
+            <th>Product Image</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        @forelse($orders as $index => $order)
             <tr>
-                <th>Sl. No</th>
-                <th>Order No</th>
-                <th>Date</th>
-                <th>Customer</th>
-                <th>Total Price</th>
-                <th>Action</th>
+                <td>{{ $index + 1 }}</td>
+                <td>#{{ $order->id }}</td>
+                <td>{{ $order->order_date }}</td>
+                <td>{{ $order->customer->name }}</td>
+                <td>₹{{ numberFormat($order->total_price) }}</td>
+                <td>
+                    @php
+                    $firstOrderItem = optional($order->orderItems)->first();
+                    $imagePath = optional($firstOrderItem?->product)->image;
+                    @endphp
+                    @if($imagePath)
+                        <img src="{{ asset('storage/' . $imagePath) }}" alt="Product Image" class="product-img">
+                    @else
+                        N/A
+                    @endif
+                </td>
+                <td class="actions">
+                    <a href="{{ route('orders.show', $order) }}" class="view">View</a>
+                    <a href="{{ route('orders.edit', $order) }}" class="edit">Edit</a>
+                    <form action="{{ route('orders.destroy', $order) }}" method="POST" onsubmit="return confirm('Delete this order?')">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="delete">Delete</button>
+                    </form>
+                </td>
             </tr>
-        </thead>
-        <tbody>
-            @forelse($orders as $index => $order)
-                <tr>
-                    <td>{{ $index + 1 }}</td>
-                    <td>#{{ $order->id }}</td>
-                    <td>{{ $order->order_date }}</td>
-                    <td>{{ $order->customer->name }}</td>
-                    <td>₹{{ $order->total_price }}</td>
-                    <td class="actions">
-                        <a href="{{ route('orders.show', $order) }}" class="view">View</a>
-                        <a href="{{ route('orders.edit', $order) }}" class="edit">Edit</a>
-                        <form action="{{ route('orders.destroy', $order) }}" method="POST" onsubmit="return confirm('Delete this order?')">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="delete">Delete</button>
-                        </form>
-                    </td>
-                </tr>
-            @empty
-                <tr>
-                    <td colspan="6" class="no-orders">No orders found.</td>
-                </tr>
-            @endforelse
-        </tbody>
-    </table>
+        @empty
+            <tr>
+                <td colspan="7" class="no-orders">No orders found.</td>
+            </tr>
+        @endforelse
+    </tbody>
+</table>
 
 </body>
 </html>
+
+@endsection

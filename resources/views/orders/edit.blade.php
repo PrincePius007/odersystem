@@ -107,6 +107,13 @@
         #add-row:hover {
             background-color: #2563eb;
         }
+        .product-image {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
 
         button[type="submit"] {
             background-color: #10b981;
@@ -188,6 +195,7 @@
             <tr>
                 <th>SL No</th>
                 <th>Product</th>
+                <th>Image</th> 
                 <th>Qty</th>
                 <th>Price</th>
                 <th>Total</th>
@@ -195,26 +203,42 @@
             </tr>
         </thead>
         <tbody id="product-rows">
-            @foreach ($order->items as $index => $item)
+        @foreach ($order->orderItems as $index => $item)
             <tr>
-                <td data-label="SL No">{{ $index + 1 }}</td>
-                <td data-label="Product">
+                <td>{{ $index + 1 }}</td>
+                <td>
                     <select name="products[{{ $index }}][product_id]" class="product-select" required>
                         <option value="">-- Select --</option>
                         @foreach ($products as $product)
-                            <option value="{{ $product->id }}" data-price="{{ $product->price }}"
+                            <option value="{{ $product->id }}"
+                                data-price="{{ $product->price }}"
+                                data-image="{{ asset('storage/' . $product->image) }}"
                                 {{ $product->id == $item->product_id ? 'selected' : '' }}>
                                 {{ $product->name }}
                             </option>
                         @endforeach
                     </select>
                 </td>
-                <td data-label="Qty"><input type="number" name="products[{{ $index }}][quantity]" class="qty" value="{{ $item->quantity }}" min="1" required></td>
-                <td data-label="Price"><input type="text" name="products[{{ $index }}][price]" class="price" value="{{ $item->price }}" readonly></td>
-                <td data-label="Total"><input type="text" name="products[{{ $index }}][total]" class="total" value="{{ $item->total }}" readonly></td>
-                <td data-label="Action"><button type="button" class="remove-row">🗑️</button></td>
+                <td>
+                    <img src="{{ asset('storage/' . $item->product->image) }}" class="product-image" />
+                </td>
+                <td>
+                    <input type="number" name="products[{{ $index }}][quantity]" class="qty"
+                        value="{{ $item->quantity }}" min="1" required>
+                </td>
+                <td>
+                    <input type="text" name="products[{{ $index }}][price]" class="price"
+                        value="{{ $item->price }}" readonly>
+                </td>
+                <td>
+                    <input type="text" name="products[{{ $index }}][total]" class="total"
+                        value="{{ $item->quantity * $item->price }}" readonly>
+                </td>
+                <td>
+                    <button type="button" class="remove-row">🗑️</button>
+                </td>
             </tr>
-            @endforeach
+        @endforeach
         </tbody>
     </table>
 
@@ -226,7 +250,7 @@
 </form>
 
 <script>
-    let rowCount = {{ count($order->items) }};
+    let rowCount = {{ count($order->orderItems) }};
     const products = @json($products);
 
     function updateTotals() {
@@ -244,11 +268,21 @@
     function addRow() {
         const table = document.getElementById('product-rows');
         const newRow = table.rows[0].cloneNode(true);
+
         newRow.querySelectorAll('input, select').forEach(el => {
-            el.name = el.name.replace(/\[\d+\]/, `[${rowCount}]`);
-            if (el.tagName === 'INPUT') el.value = '';
-            if (el.tagName === 'SELECT') el.selectedIndex = 0;
+            const name = el.name;
+            if (name) {
+                el.name = name.replace(/\[\d+\]/, `[${rowCount}]`);
+            }
+            if (el.tagName === 'INPUT') {
+                el.value = el.classList.contains('price') || el.classList.contains('total') ? '0' : '';
+            }
+            if (el.tagName === 'SELECT') {
+                el.selectedIndex = 0;
+            }
         });
+
+        newRow.querySelector('.product-image').src = '';
         newRow.querySelector('td:first-child').textContent = rowCount + 1;
         table.appendChild(newRow);
         rowCount++;
@@ -259,9 +293,13 @@
 
     document.addEventListener('change', function (e) {
         if (e.target.classList.contains('product-select')) {
-            const price = e.target.selectedOptions[0].dataset.price || 0;
+            const option = e.target.selectedOptions[0];
+            const price = option.dataset.price || 0;
+            const image = option.dataset.image || '';
             const row = e.target.closest('tr');
+
             row.querySelector('.price').value = price;
+            row.querySelector('.product-image').src = image;
             updateTotals();
         }
 

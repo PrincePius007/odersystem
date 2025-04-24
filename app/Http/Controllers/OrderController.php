@@ -12,12 +12,18 @@ use App\Models\Customer;
 class OrderController extends Controller
 {
     //index
-    public function index(){
-        
-        $orders = Order::with('customer')->get();
-
-        return view('orders.index',compact('orders'));
+    public function index()
+    {
+        $orders = Order::with(['customer', 'orderItems.product'])->get();
+    
+        // Format total price for each order
+        foreach ($orders as $order) {
+            $order->formatted_total_price = numberFormat($order->total_price);
+        }
+    
+        return view('orders.index', compact('orders'));
     }
+    
 
     //create
     public function create(){
@@ -88,11 +94,14 @@ public function show(Order $order)
 //edit
 public function edit(Order $order)
 {
-    $order->load(['customer', 'items.product']);
-    $products = \App\Models\Product::all();
+    $order->load('orderItems.product'); // preload product with image
 
-    return view('orders.edit', compact('order', 'products'));
+    $customers = Customer::all();
+    $products = Product::all();
+
+    return view('orders.edit', compact('order', 'customers', 'products'));
 }
+
 //update
 public function update(Request $request, Order $order)
 {
