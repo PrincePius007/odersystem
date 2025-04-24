@@ -9,7 +9,7 @@ use App\Models\Product;
 class OrderItem extends Model
 {
     //
-    protected $fillable = ['order_id', 'product_id', 'quantity', 'price', 'total'];
+    protected $fillable = ['order_id', 'product_id','image', 'quantity', 'price', 'total'];
     
     public function product()
 {

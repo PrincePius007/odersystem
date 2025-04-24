@@ -24,5 +24,4 @@ public function orderItems()
     return $this->hasMany(OrderItem::class);
 }
 
-
 }

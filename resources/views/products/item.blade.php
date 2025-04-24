@@ -23,8 +23,7 @@
     <div class="row">
     @foreach($products as $product)
 <div class="col-md-4 mb-4">
-    <div class="card" style="width: 18rem;">
-
+    <div class="card
         @if($product->image && file_exists(storage_path('app/public/' . $product->image)))
         <img src="{{ asset('storage/' . $product->image) }}" alt="Product Image" class="card-img-top">
     @else
@@ -56,6 +55,15 @@
     </div>
 
     <a href="{{ route('products.create') }}" class="btn btn-primary mt-4">Add New Product</a>
+</div>
+
+</body>
+</html>
+ary mt-4">Add New Product</a>
+</div>
+
+</body>
+</html>duct</a>
 </div>
 
 </body>
