@@ -12,13 +12,20 @@
     <meta charset="UTF-8">
     <title>Orders</title>
     <style>
-        body {
-            margin: 0;
-            padding: 40px;
-            font-family: 'Helvetica Neue', sans-serif;
-            background-color: #f9f9fb;
-            color: #333;
-        }
+       
+       body {
+    margin: 0;
+    padding: 0;
+    height: 100vh; /* Full viewport height */
+    font-family: 'Helvetica Neue', sans-serif;
+
+    background-image: url("https://t3.ftcdn.net/jpg/04/48/86/32/360_F_448863212_g7TV4gjKhmxLkh3KhY8BZzHwihVS4PuM.jpg");
+    background-size: cover;           /* Cover full screen */
+    background-repeat: no-repeat;     /* No tiling */
+    background-position: center;      /* Center the image */
+    background-attachment: fixed;     /* Optional: adds parallax feel */
+}
+
 
         h1 {
             text-align: center;
@@ -128,6 +135,7 @@
             border-radius: 6px;
             object-fit: cover;
         }
+
     </style>
 </head>
 <body>

@@ -1,3 +1,11 @@
+@extends('layouts.app')
+
+@section('content')
+
+@if(session('success'))
+    <div class="alert alert-success">{{ session('success') }}</div>
+@endif
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,17 +14,24 @@
     <style>
         body {
             font-family: 'Segoe UI', sans-serif;
-            background-color: #f7f9fb;
+           
             color: #333;
             padding: 40px;
             margin: 0;
+            
+    background-image: url("https://img.freepik.com/premium-vector/pastel-color-background-abstract-design_336924-5234.jpg");
+    background-size: cover;           /* Cover full screen */
+    background-repeat: no-repeat;     /* No tiling */
+    background-position: center;      /* Center the image */
+    background-attachment: fixed;   
         }
 
         h1 {
             text-align: center;
             margin-bottom: 30px;
             font-size: 28px;
-            color: #2c3e50;
+            color: #121c2f;
+
         }
 
         form {
@@ -261,3 +276,4 @@
 
 </body>
 </html>
+@endsection
